@@ -1,29 +1,37 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
-import { Upload, AlertCircle, Check, Pill } from "lucide-react"
+import { Upload, AlertCircle, Check } from "lucide-react"
 import AnimationWrapper from "@/components/animation-wrapper"
 
-interface DetectionResult {
-  disease: string
-  confidence: number
-  causes: string[]
-  effects: string[]
-  treatment: string[]
-  prevention: string[]
+
+interface DiseaseDetails {
+  causes: string[];
+  effects: string[];
+  treatment: string[];
+  prevention: string[];
 }
+
+interface CropDiseases {
+  [diseaseName: string]: DiseaseDetails;
+}
+
+interface DiseaseInfo {
+  [cropName: string]: CropDiseases;
+}
+
+let diseaseName: string, confidence: number
 
 export default function ServicesPage() {
   const [selectedCrop, setSelectedCrop] = useState("")
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const [result, setResult] = useState<DetectionResult | null>(null)
+  const [result, setResult] = useState<DiseaseDetails | null>(null)
   const [error, setError] = useState<string | null>(null)
 
-  const crops = ["Rice", "Wheat", "Cotton", "Sugarcane", "Maize", "Potato", "Tomato", "Chili", "Soybean", "Groundnut"]
+  const crops = ["Potato", "Corn", "Rice", "Wheat", "Pepper Bulb"]
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -35,7 +43,226 @@ export default function ServicesPage() {
     }
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+
+  
+  const diseaseInfoMap: DiseaseInfo = {
+    Potato: {
+      "Early Blight": {
+        causes: [
+          "Fungus Alternaria solani infects older leaves",
+          "Thrives in warm weather and high humidity, especially during prolonged leaf wetness",
+        ],
+        effects: [
+          "Dark brown to black spots with concentric rings on older leaves",
+          "Premature defoliation reduces photosynthesis efficiency",
+          "Can result in significant yield loss if left untreated",
+        ],
+        treatment: [
+          "Apply Mancozeb @ 2g/L at early signs of disease",
+          "Follow crop rotation practices to prevent recurrence",
+          "Remove and destroy infected plant debris from the field",
+        ],
+        prevention: [
+          "Practice crop rotation with non-host crops",
+          "Avoid overhead irrigation to reduce leaf wetness",
+          "Use resistant or tolerant potato varieties if available",
+        ],
+      },
+      "Late Blight": {
+        causes: [
+          "Caused by oomycete Phytophthora infestans",
+          "Favors cool temperatures (10–20°C) and high humidity with extended leaf wetness",
+        ],
+        effects: [
+          "Water-soaked irregular lesions on leaves and stems",
+          "White, fluffy mold growth underneath leaves during humid conditions",
+          "Rapid plant collapse and destruction of tubers in advanced stages",
+        ],
+        treatment: [
+          "Use a combination of Metalaxyl + Mancozeb @ 2g/L as foliar spray",
+          "Plant disease-resistant potato varieties if available",
+        ],
+        prevention: [
+          "Ensure proper field drainage and avoid overcrowding plants",
+          "Remove volunteer potato plants and infected debris",
+          "Use disease-free seed tubers",
+        ],
+      },
+      Healthy: {
+        causes: [],
+        effects: ["No visible signs of disease; leaves are green and intact"],
+        treatment: ["Maintain good farming practices including timely irrigation and sanitation"],
+        prevention: ["Regular crop monitoring and timely intervention", "Use certified seeds and rotate crops"],
+      },
+    },
+  
+    Corn: {
+      "Gray Leaf Spot": {
+        causes: [
+          "Fungal infection by Cercospora zeae-maydis",
+          "High humidity and minimum air circulation promote disease",
+        ],
+        effects: [
+          "Narrow, rectangular, tan-colored lesions on leaves",
+          "Lesions merge to form large necrotic areas, reducing leaf surface for photosynthesis",
+        ],
+        treatment: [
+          "Timely application of recommended fungicides (e.g., azoxystrobin)",
+          "Use resistant hybrids suited for your region",
+          "Rotate with non-host crops like soybean",
+        ],
+        prevention: [
+          "Ensure proper plant spacing for airflow",
+          "Avoid monocropping and maintain field hygiene",
+          "Use tillage to incorporate crop residue and reduce spore load",
+        ],
+      },
+      "Common Rust": {
+        causes: [
+          "Fungal pathogen Puccinia sorghi spread by wind-borne spores",
+          "Develops rapidly under moist, moderate temperature conditions",
+        ],
+        effects: [
+          "Reddish-brown pustules appear on both upper and lower leaf surfaces",
+          "Severe infections reduce photosynthetic activity and grain fill",
+        ],
+        treatment: [
+          "Spray fungicides such as tebuconazole or propiconazole",
+          "Prefer hybrids with rust resistance",
+        ],
+        prevention: [
+          "Avoid late planting as rust risk increases",
+          "Scout fields regularly for early signs of rust",
+          "Implement crop rotation with non-host species",
+        ],
+      },
+      "Leaf Blight": {
+        causes: [
+          "Fungal infection by Helminthosporium turcicum (Exserohilum turcicum)",
+          "Infects during cool, humid weather, especially in poorly rotated fields",
+        ],
+        effects: [
+          "Gray-green lesions that enlarge and become tan with dark margins",
+          "Rapid death of leaves, leading to poor grain development",
+        ],
+        treatment: [
+          "Use certified seeds treated with appropriate fungicide",
+          "Remove and destroy crop residues after harvest",
+        ],
+        prevention: [
+          "Plant resistant varieties",
+          "Avoid dense planting to reduce leaf wetness",
+          "Use crop rotation and field sanitation",
+        ],
+      },
+      Healthy: {
+        causes: [],
+        effects: ["Healthy crop with vibrant green foliage and upright posture"],
+        treatment: [],
+        prevention: ["Use disease-resistant varieties", "Maintain field cleanliness and rotate crops"],
+      },
+    },
+  
+    "Pepper Bulb": {
+      "Bacterial Spot": {
+        causes: [
+          "Bacterial pathogen Xanthomonas campestris pv. vesicatoria infects leaves and fruits",
+          "Favored by warm, wet conditions and spread through splashing water or tools",
+        ],
+        effects: [
+          "Dark water-soaked lesions that later become necrotic",
+          "Leaf drop, fruit spots, and defoliation reduce yield and quality",
+        ],
+        treatment: [
+          "Apply copper-based bactericides regularly during growing season",
+          "Start with certified disease-free seeds or transplants",
+        ],
+        prevention: [
+          "Avoid overhead irrigation",
+          "Disinfect tools and equipment",
+          "Do not handle wet plants; rotate crops every season",
+        ],
+      },
+      Healthy: {
+        causes: [],
+        effects: ["Healthy pepper plants with glossy leaves and firm bulbs"],
+        treatment: [],
+        prevention: ["Use healthy seeds and proper spacing", "Water at the base to prevent leaf wetness"],
+      },
+    },
+  
+    Rice: {
+      "Brown Spot": {
+        causes: [
+          "Caused by fungus Bipolaris oryzae, often seed-borne",
+          "Exacerbated by nutrient deficiency (especially potassium), drought, and poor drainage",
+        ],
+        effects: [
+          "Circular to oval brown lesions on leaves, seeds, and grains",
+          "Affects grain filling and overall grain quality",
+        ],
+        treatment: [
+          "Apply balanced fertilizers, especially potassium and phosphorus",
+          "Treat seeds with fungicide before sowing",
+        ],
+        prevention: [
+          "Avoid excessive nitrogen use",
+          "Ensure proper field drainage",
+          "Use certified, treated seeds",
+        ],
+      },
+      "Leaf Blast": {
+        causes: [
+          "Fungal disease caused by Magnaporthe oryzae, affecting foliage and collars",
+          "Develops under high humidity and leaf wetness with temperature 25–30°C",
+        ],
+        effects: [
+          "Spindle-shaped lesions with grey centers and brown margins on leaves",
+          "Severe infections cause leaf wilting and drying",
+        ],
+        treatment: [
+          "Apply silicon-based fertilizers to strengthen plant cell walls",
+          "Use effective fungicides like Tricyclazole at early symptom stage",
+        ],
+        prevention: [
+          "Avoid excess nitrogen application",
+          "Ensure good air circulation and spacing between plants",
+          "Use resistant rice varieties when possible",
+        ],
+      },
+      "Neck Blast": {
+        causes: [
+          "A form of blast caused by Magnaporthe oryzae, attacking the panicle neck",
+          "Aggravated by excessive nitrogen and water stagnation",
+        ],
+        effects: [
+          "Neck turns black and weakens, leading to panicle breakage",
+          "Spikelets remain unfilled or develop poorly, reducing grain yield",
+        ],
+        treatment: [
+          "Cultivate resistant rice varieties",
+          "Use optimal nitrogen levels and maintain field drainage",
+        ],
+        prevention: [
+          "Avoid over-irrigation and water stagnation",
+          "Apply fertilizers in recommended dose and timing",
+          "Regularly monitor fields during flowering stage",
+        ],
+      },
+      Health: {
+        causes: [],
+        effects: ["Healthy crop with tall, upright tillers and no visible lesions"],
+        treatment: [],
+        prevention: ["Maintain proper nutrition and spacing", "Monitor for early signs of disease regularly"],
+      },
+    },
+  };
+  
+  
+  // export default diseaseInfo;
+  
+  
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!selectedCrop) {
       setError("Please select a crop type")
@@ -49,337 +276,155 @@ export default function ServicesPage() {
     setIsAnalyzing(true)
     setError(null)
 
-    // Simulate API call for disease detection
-    setTimeout(() => {
-      setIsAnalyzing(false)
+    const formData = new FormData()
+    formData.append("crop", selectedCrop)
+    formData.append("image", selectedFile)
 
-      // Mock results based on crop type
-      const mockResults: { [key: string]: DetectionResult } = {
-        Rice: {
-          disease: "Rice Blast",
-          confidence: 92.5,
-          causes: ["Fungal pathogen Magnaporthe oryzae", "High humidity (>90%)", "Temperature between 24-28°C"],
-          effects: [
-            "Elliptical or spindle-shaped lesions with pointed ends",
-            "Gray centers and brown margins on leaves",
-            "Reduced photosynthesis",
-            "Yield loss of 30-50% in severe cases",
-          ],
-          treatment: [
-            "Apply fungicides like Tricyclazole (75% WP) @ 0.6g/L",
-            "Isoprothiolane (40% EC) @ 1.5ml/L",
-            "Spray at early stages of infection",
-          ],
-          prevention: [
-            "Use resistant varieties",
-            "Balanced fertilization (avoid excess nitrogen)",
-            "Proper spacing between plants for good air circulation",
-            "Seed treatment with fungicides before sowing",
-          ],
-        },
-        Wheat: {
-          disease: "Wheat Rust (Yellow Rust)",
-          confidence: 88.7,
-          causes: ["Fungal pathogen Puccinia striiformis", "Cool temperatures (10-15°C)", "High humidity or dew"],
-          effects: [
-            "Yellow-orange pustules arranged in stripes on leaves",
-            "Reduced grain filling",
-            "Shriveled grains",
-            "Yield loss of 10-70% depending on severity",
-          ],
-          treatment: [
-            "Apply Propiconazole (25% EC) @ 0.1%",
-            "Tebuconazole (25.9% EC) @ 0.1%",
-            "Spray at first sign of disease",
-          ],
-          prevention: [
-            "Plant resistant varieties",
-            "Early sowing to escape favorable disease conditions",
-            "Destroy volunteer wheat plants",
-            "Crop rotation with non-host crops",
-          ],
-        },
-        Cotton: {
-          disease: "Cotton Leaf Curl Virus",
-          confidence: 95.2,
-          causes: [
-            "Cotton leaf curl virus transmitted by whitefly",
-            "High whitefly population",
-            "Warm and dry conditions",
-          ],
-          effects: [
-            "Upward or downward curling of leaves",
-            "Thickened veins and enations on underside of leaves",
-            "Stunted growth",
-            "Reduced boll formation and yield loss up to 30-80%",
-          ],
-          treatment: [
-            "No direct cure for viral infection",
-            "Control whitefly vector using Imidacloprid (17.8% SL) @ 0.5ml/L",
-            "Thiamethoxam (25% WG) @ 0.2g/L",
-          ],
-          prevention: [
-            "Use resistant/tolerant varieties",
-            "Early sowing to escape peak whitefly population",
-            "Remove and destroy infected plants",
-            "Maintain field hygiene and remove weed hosts",
-          ],
-        },
-        Sugarcane: {
-          disease: "Red Rot",
-          confidence: 91.3,
-          causes: ["Fungal pathogen Colletotrichum falcatum", "Infected setts", "Waterlogged conditions"],
-          effects: [
-            "Reddening of internal tissues with white patches",
-            "Drying of leaves from top to bottom",
-            "Sour alcoholic smell from infected canes",
-            "Yield loss of 30-100% in susceptible varieties",
-          ],
-          treatment: [
-            "No effective chemical control once infected",
-            "Remove and destroy infected plants",
-            "Improve drainage in waterlogged areas",
-          ],
-          prevention: [
-            "Use disease-free setts for planting",
-            "Treat setts with Carbendazim (50% WP) @ 0.1%",
-            "Crop rotation with rice or legumes",
-            "Avoid ratooning in infected fields",
-          ],
-        },
-        default: {
-          disease: "Leaf Spot Disease",
-          confidence: 85.0,
-          causes: ["Fungal pathogen", "High humidity", "Poor air circulation"],
-          effects: [
-            "Circular or irregular spots on leaves",
-            "Yellowing of leaves",
-            "Premature leaf drop",
-            "Reduced yield",
-          ],
-          treatment: [
-            "Apply appropriate fungicides",
-            "Remove and destroy infected plant parts",
-            "Improve air circulation",
-          ],
-          prevention: [
-            "Use resistant varieties",
-            "Proper spacing between plants",
-            "Balanced fertilization",
-            "Crop rotation",
-          ],
-        },
+    try {
+      const response = await fetch("http://127.0.0.1:8000/predict/", {
+        method: "POST",
+        body: formData,
+      })
+
+      if (!response.ok) {
+        throw new Error("Prediction failed")
       }
 
-      // Set result based on selected crop or default
-      setResult(mockResults[selectedCrop] || mockResults.default)
-    }, 2000)
+      const predictions: Record<string, number> = await response.json()
+
+      const topDisease = Object.entries(predictions).sort((a, b) => b[1] - a[1])[0]
+      let [d, c] = topDisease
+      diseaseName = d
+
+      const diseaseInfo = diseaseInfoMap[selectedCrop][diseaseName]
+      confidence = parseFloat(c.toFixed(2))
+
+      setResult(diseaseInfo)
+    } catch (err) {
+      setError("Failed to analyze the image. Please try again.")
+    } finally {
+      setIsAnalyzing(false)
+    }
   }
 
   return (
     <div className="min-h-screen pt-20 pb-10 bg-background-light">
       <div className="container mx-auto px-4">
         <AnimationWrapper>
-          <h1 className="text-3xl md:text-4xl font-bold text-primary-green text-center mb-4">Crop Disease Detection</h1>
+          <h1 className="text-4xl font-bold text-primary-green text-center mb-4">
+            Crop Disease Detection
+          </h1>
           <p className="text-center text-secondary-green mb-12 max-w-2xl mx-auto">
             Upload an image of your crop to identify diseases and get treatment recommendations.
           </p>
         </AnimationWrapper>
 
-        <div className="max-w-5xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <AnimationWrapper delay={200}>
-              <div className="bg-white p-6 rounded-lg shadow-md">
-                <h2 className="text-xl font-semibold text-primary-green mb-6">Upload Crop Image</h2>
-                <form onSubmit={handleSubmit}>
-                  <div className="mb-4">
-                    <label htmlFor="crop" className="block text-secondary-green mb-2">
-                      Select Crop Type
-                    </label>
-                    <select
-                      id="crop"
-                      value={selectedCrop}
-                      onChange={(e) => setSelectedCrop(e.target.value)}
-                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-green"
-                    >
-                      <option value="">Select a crop</option>
-                      {crops.map((crop) => (
-                        <option key={crop} value={crop}>
-                          {crop}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="mb-6">
-                    <label htmlFor="image" className="block text-secondary-green mb-2">
-                      Upload Image
-                    </label>
-                    <div className="border-2 border-dashed border-gray-300 rounded-md p-4 text-center">
-                      <input type="file" id="image" accept="image/*" onChange={handleFileChange} className="hidden" />
-                      <label htmlFor="image" className="cursor-pointer flex flex-col items-center">
-                        <Upload size={40} className="text-secondary-green mb-2" />
-                        <span className="text-secondary-green">Click to upload or drag and drop</span>
-                        <span className="text-sm text-gray-500 mt-1">JPG, PNG or JPEG (max. 5MB)</span>
-                      </label>
-                      {previewUrl && (
-                        <div className="mt-4">
-                          <img
-                            src={previewUrl || "/placeholder.svg"}
-                            alt="Preview"
-                            className="max-h-48 mx-auto rounded-md"
-                          />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {error && (
-                    <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md flex items-center">
-                      <AlertCircle size={20} className="mr-2" />
-                      {error}
-                    </div>
-                  )}
-
-                  <button
-                    type="submit"
-                    className="w-full btn-primary-green py-3 rounded-md font-medium"
-                    disabled={isAnalyzing}
+        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10">
+          <AnimationWrapper delay={100}>
+            <div className="bg-white p-6 rounded-lg shadow-md" style={{marginRight: '5px'}}>
+              <form onSubmit={handleSubmit}>
+                <div className="mb-4">
+                  <label htmlFor="crop" className="block text-secondary-green mb-2 font-medium">
+                    Select Crop Type
+                  </label>
+                  <select
+                    id="crop"
+                    value={selectedCrop}
+                    onChange={(e) => setSelectedCrop(e.target.value)}
+                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-green"
                   >
-                    {isAnalyzing ? (
-                      <span className="flex items-center justify-center">
-                        <svg
-                          className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          ></circle>
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                          ></path>
-                        </svg>
-                        Analyzing Image...
-                      </span>
-                    ) : (
-                      "Detect Disease"
+                    <option value="">-- Choose a crop --</option>
+                    {crops.map((crop) => (
+                      <option key={crop} value={crop}>
+                        {crop}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="mb-6">
+                  <label htmlFor="image" className="block text-secondary-green mb-2 font-medium">
+                    Upload Image
+                  </label>
+                  <div className="border-2 border-dashed border-gray-300 rounded-md p-4 text-center">
+                    <input
+                      type="file"
+                      id="image"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      className="hidden"
+                    />
+                    <label htmlFor="image" className="cursor-pointer flex flex-col items-center">
+                      <Upload size={36} className="text-secondary-green mb-2" />
+                      <span className="text-secondary-green">Click to upload or drag and drop</span>
+                      <span className="text-sm text-gray-500 mt-1">JPG, PNG or JPEG (max. 5MB)</span>
+                    </label>
+                    {previewUrl && (
+                      <img src={previewUrl} alt="Preview" className="mt-4 rounded-md max-h-48 mx-auto" />
                     )}
-                  </button>
-                </form>
-              </div>
-            </AnimationWrapper>
-
-            <AnimationWrapper delay={400}>
-              <div className="bg-white p-6 rounded-lg shadow-md">
-                <h2 className="text-xl font-semibold text-primary-green mb-6">Detection Results</h2>
-                {!result && !isAnalyzing ? (
-                  <div className="text-center py-12">
-                    <img src="/placeholder.svg?height=150&width=150" alt="Upload" className="mx-auto mb-4 opacity-50" />
-                    <p className="text-secondary-green">Upload an image to see disease detection results</p>
                   </div>
-                ) : isAnalyzing ? (
-                  <div className="text-center py-12">
-                    <div className="w-16 h-16 border-4 border-primary-green border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                    <p className="text-secondary-green">Analyzing your crop image...</p>
+                </div>
+
+                {error && (
+                  <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md flex items-center">
+                    <AlertCircle size={20} className="mr-2" />
+                    {error}
                   </div>
-                ) : (
-                  result && (
-                    <div className="space-y-4">
-                      <div className="bg-accent-beige/30 p-4 rounded-md">
-                        <div className="flex justify-between items-center">
-                          <h3 className="font-semibold text-primary-green">Detected Disease</h3>
-                          <span className="bg-primary-green text-white px-2 py-1 rounded-md text-sm">
-                            {result.confidence.toFixed(1)}% Confidence
-                          </span>
-                        </div>
-                        <p className="text-xl font-bold text-primary-green mt-2">{result.disease}</p>
-                      </div>
-
-                      <div>
-                        <h3 className="font-semibold text-primary-green mb-2">Causes</h3>
-                        <ul className="list-disc list-inside text-secondary-green">
-                          {result.causes.map((cause, i) => (
-                            <li key={i}>{cause}</li>
-                          ))}
-                        </ul>
-                      </div>
-
-                      <div>
-                        <h3 className="font-semibold text-primary-green mb-2">Effects</h3>
-                        <ul className="list-disc list-inside text-secondary-green">
-                          {result.effects.map((effect, i) => (
-                            <li key={i}>{effect}</li>
-                          ))}
-                        </ul>
-                      </div>
-
-                      <div>
-                        <h3 className="font-semibold text-primary-green mb-2">Treatment</h3>
-                        <ul className="list-disc list-inside text-secondary-green">
-                          {result.treatment.map((item, i) => (
-                            <li key={i}>{item}</li>
-                          ))}
-                        </ul>
-                      </div>
-
-                      <div>
-                        <h3 className="font-semibold text-primary-green mb-2">Prevention</h3>
-                        <ul className="list-disc list-inside text-secondary-green">
-                          {result.prevention.map((item, i) => (
-                            <li key={i}>{item}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
-                  )
                 )}
-              </div>
-            </AnimationWrapper>
-          </div>
 
-          <AnimationWrapper delay={600}>
-            <div className="mt-12 bg-white p-6 rounded-lg shadow-md">
-              <h2 className="text-xl font-semibold text-primary-green mb-6">How It Works</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-accent-beige rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Upload size={32} className="text-primary-green" />
-                  </div>
-                  <h3 className="font-semibold text-primary-green mb-2">1. Upload Image</h3>
-                  <p className="text-secondary-green">
-                    Take a clear photo of the affected plant part and upload it to our platform.
-                  </p>
-                </div>
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-accent-beige rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Check size={32} className="text-primary-green" />
-                  </div>
-                  <h3 className="font-semibold text-primary-green mb-2">2. AI Analysis</h3>
-                  <p className="text-secondary-green">
-                    Our AI system analyzes the image to identify the disease and its severity.
-                  </p>
-                </div>
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-accent-beige rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Pill size={32} className="text-primary-green" />
-                  </div>
-                  <h3 className="font-semibold text-primary-green mb-2">3. Get Recommendations</h3>
-                  <p className="text-secondary-green">
-                    Receive detailed information about the disease and specific treatment recommendations.
-                  </p>
-                </div>
-              </div>
+                <button
+                  type="submit"
+                  className="w-full bg-primary-green text-white py-3 rounded-md font-medium hover:bg-green-700 transition"
+                  disabled={isAnalyzing}
+                >
+                  {isAnalyzing ? "Analyzing..." : "Analyze Image"}
+                </button>
+              </form>
             </div>
           </AnimationWrapper>
+
+          {result && (
+            <AnimationWrapper delay={200}>
+              <div className="bg-white p-6 rounded-lg shadow-md" style={{marginLeft: '5px', height: '100%'}}>
+                <h2 className="text-2xl font-semibold text-primary-green mb-4 flex items-center">
+                  <Check className="mr-2 text-green-600" />
+                  Detected: {diseaseName}
+                </h2>
+                <p className="text-gray-600 mb-2">Confidence: <strong>{confidence*100}%</strong></p>
+
+                <div className="mt-4 space-y-4" style={{height: '100%'}}>
+                  {result.causes.length > 0 && (
+                    <div>
+                      <h3 className="font-semibold text-secondary-green">Causes</h3>
+                      <ul className="list-disc pl-5 text-sm text-gray-700">
+                        {result.causes.map((c, idx) => <li key={idx}>{c}</li>)}
+                      </ul>
+                    </div>
+                  )}
+                  <div>
+                    <h3 className="font-semibold text-secondary-green">Effects</h3>
+                    <ul className="list-disc pl-5 text-sm text-gray-700">
+                      {result.effects.map((e, idx) => <li key={idx}>{e}</li>)}
+                    </ul>
+                  </div>
+                  {result.treatment.length > 0 && (
+                    <div>
+                      <h3 className="font-semibold text-secondary-green">Treatment</h3>
+                      <ul className="list-disc pl-5 text-sm text-gray-700">
+                        {result.treatment.map((t, idx) => <li key={idx}>{t}</li>)}
+                      </ul>
+                    </div>
+                  )}
+                  <div>
+                    <h3 className="font-semibold text-secondary-green">Prevention</h3>
+                    <ul className="list-disc pl-5 text-sm text-gray-700">
+                      {result.prevention.map((p: string, idx:number) => <li key={idx}>{p}</li>)}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </AnimationWrapper>
+          )}
         </div>
       </div>
     </div>

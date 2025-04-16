@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useRef, useEffect } from "react"
 import { Send, Loader2 } from "lucide-react"
 import AnimationWrapper from "@/components/animation-wrapper"
@@ -11,6 +10,8 @@ interface Message {
   text: string
   sender: "user" | "bot"
 }
+
+const languageOptions = ["English", "Hindi", "Tamil", "Telugu", "Kannada", "Marathi"]
 
 export default function ChatbotPage() {
   const [messages, setMessages] = useState<Message[]>([
@@ -22,6 +23,7 @@ export default function ChatbotPage() {
   ])
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [language, setLanguage] = useState("English")
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const scrollToBottom = () => {
@@ -32,51 +34,65 @@ export default function ChatbotPage() {
     scrollToBottom()
   }, [messages])
 
-  const handleSendMessage = (e: React.FormEvent) => {
+  const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!input.trim()) return
 
-    // Add user message
     const userMessage: Message = {
       id: messages.length + 1,
       text: input,
       sender: "user",
     }
+
     setMessages((prev) => [...prev, userMessage])
     setInput("")
     setIsLoading(true)
 
-    // Simulate bot response
-    setTimeout(() => {
-      const botResponses: { [key: string]: string } = {
-        rice: "Rice is susceptible to blast, bacterial leaf blight, and brown spot. Make sure to monitor your crop regularly.",
-        wheat:
-          "Common wheat diseases include rust, powdery mildew, and loose smut. Early detection is crucial for treatment.",
-        cotton:
-          "Cotton can suffer from bollworms, bacterial blight, and fusarium wilt. Regular inspection helps prevent spread.",
-        default:
-          "I can help you identify crop diseases and provide treatment recommendations. Please upload an image or ask a specific question about your crop.",
-      }
-
-      let botReply = botResponses.default
-      const lowerInput = input.toLowerCase()
-
-      // Check for keywords in user input
-      Object.keys(botResponses).forEach((key) => {
-        if (lowerInput.includes(key)) {
-          botReply = botResponses[key]
-        }
+    try {
+      console.log( messages.map((m) => `${m.sender === "user" ? "User" : "Bot"}: ${m.text}`).join("\n"))
+      const response = await fetch("http://127.0.0.1:8000/query", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_history: messages.map((m) => `${m.sender === "user" ? "User" : "Bot"}: ${m.text}`).join("\n"),
+          query: input,
+          language: language,
+        }),
       })
 
-      // Add bot response
-      const botMessage: Message = {
-        id: messages.length + 2,
-        text: botReply,
-        sender: "bot",
-      }
+      const data = await response.json()
+      const answer = data.answer.replace("\n", "<br>")
+      const sourcesLinks =
+      data.sources?.length > 0
+        ? data.sources
+            .map((source: string) => {
+              const match = source.match(/page\s*(\d+)/i)
+              const page = match ? match[1] : "1"
+              return `<a href="https://www.manage.gov.in/publications/farmerbook.pdf#page=${page}" target="_blank" class="underline text-blue-600 hover:text-blue-800">Page ${page}</a>`
+            })
+            .join(", ")
+        : ""
+    
+    const botMessage: Message = {
+      id: messages.length + 2,
+      text: `${answer}<br>${sourcesLinks ? `\n\n📄 Sources: ${sourcesLinks}` : ""}`,
+      sender: "bot",
+    }
+
       setMessages((prev) => [...prev, botMessage])
+    } catch (error) {
+      console.error("Error:", error)
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: messages.length + 2,
+          text: "Sorry, something went wrong.",
+          sender: "bot",
+        },
+      ])
+    } finally {
       setIsLoading(false)
-    }, 1000)
+    }
   }
 
   return (
@@ -90,9 +106,23 @@ export default function ChatbotPage() {
         </AnimationWrapper>
 
         <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
-          <div className="bg-primary-green text-white p-4">
-            <h2 className="font-semibold">CropGuard Assistant</h2>
-            <p className="text-sm opacity-80">Available in Hindi, Tamil, Telugu, and English</p>
+          <div className="bg-primary-green text-white p-4 flex justify-between items-center">
+            <div>
+              <h2 className="font-semibold">CropGuard Assistant</h2>
+              <p className="text-sm opacity-80">Available in Hindi, Tamil, Telugu, Kannada, Marathi, and English</p>
+            </div>
+            <select
+              style={{textAlign: 'center'}}
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
+              className="bg-white text-primary-green font-medium px-3 py-2 rounded-md shadow-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-green hover:border-primary-green transition-all duration-200"
+            >
+              {languageOptions.map((lang) => (
+                <option key={lang} value={lang}>
+                  {lang}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="h-[500px] overflow-y-auto p-4 flex flex-col">
@@ -101,7 +131,11 @@ export default function ChatbotPage() {
                 key={message.id}
                 className={`chat-message ${message.sender === "user" ? "user-message" : "bot-message"}`}
               >
-                {message.text}
+                {message.sender === "bot" ? (
+                  <div dangerouslySetInnerHTML={{ __html: message.text }} />
+                ) : (
+                  message.text
+                )}
               </div>
             ))}
             {isLoading && (
