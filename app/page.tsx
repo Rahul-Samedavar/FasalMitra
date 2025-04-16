@@ -8,22 +8,22 @@ export default function Home() {
   const crops = [
     {
       name: "Rice",
-      image: "/placeholder.svg?height=300&width=400",
+      image: "rice.jpg",
       description: "India's staple crop, grown in various regions with different varieties suited to local conditions.",
     },
     {
       name: "Wheat",
-      image: "/placeholder.svg?height=300&width=400",
+      image: "wheat.jpg",
       description: "A major rabi crop grown in the northern plains, crucial for food security in India.",
     },
     {
       name: "Cotton",
-      image: "/placeholder.svg?height=300&width=400",
+      image: "cotton.jpg",
       description: "An important cash crop supporting India's textile industry and rural livelihoods.",
     },
     {
       name: "Sugarcane",
-      image: "/placeholder.svg?height=300&width=400",
+      image: "sugar.jpeg",
       description: "A high-value crop grown for sugar production, with India being a major producer.",
     },
   ]
@@ -167,7 +167,7 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between">
             <div className="mb-6 md:mb-0">
-              <h3 className="text-xl font-bold mb-4">CropGuard</h3>
+              <h3 className="text-xl font-bold mb-4">Fasal-Mitra</h3>
               <p className="max-w-xs">Empowering Indian farmers with AI-powered crop disease detection and support.</p>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
@@ -219,14 +219,14 @@ export default function Home() {
               <div>
                 <h4 className="font-semibold mb-3">Contact</h4>
                 <ul className="space-y-2">
-                  <li>support@cropguard.in</li>
+                  <li>support@Fasal-Mitra.in</li>
                   <li>+91 98765 43210</li>
                 </ul>
               </div>
             </div>
           </div>
           <div className="border-t border-white/20 mt-8 pt-8 text-center">
-            <p>&copy; {new Date().getFullYear()} CropGuard. All rights reserved.</p>
+            <p>&copy; {new Date().getFullYear()} Fasal-Mitra. All rights reserved.</p>
           </div>
         </div>
       </footer>

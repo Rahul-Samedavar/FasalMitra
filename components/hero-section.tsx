@@ -34,7 +34,7 @@ const HeroSection = () => {
           <AnimationWrapper className="md:w-1/2" delay={300}>
             <div className="relative">
               <img
-                src="/placeholder.svg?height=400&width=500"
+                src="b.jpg"
                 alt="Farmer using crop disease detection app"
                 className="rounded-lg shadow-lg w-full"
               />

@@ -8,22 +8,22 @@ export default function Home() {
   const crops = [
     {
       name: "Rice",
-      image: "/placeholder.svg?height=300&width=400",
+      image: "rice.jpg",
       description: "India's staple crop, grown in various regions with different varieties suited to local conditions.",
     },
     {
       name: "Wheat",
-      image: "/placeholder.svg?height=300&width=400",
+      image: "wheat.jpg",
       description: "A major rabi crop grown in the northern plains, crucial for food security in India.",
     },
     {
       name: "Cotton",
-      image: "/placeholder.svg?height=300&width=400",
+      image: "cotton.jpg",
       description: "An important cash crop supporting India's textile industry and rural livelihoods.",
     },
     {
       name: "Sugarcane",
-      image: "/placeholder.svg?height=300&width=400",
+      image: "sugar.jpeg",
       description: "A high-value crop grown for sugar production, with India being a major producer.",
     },
   ]

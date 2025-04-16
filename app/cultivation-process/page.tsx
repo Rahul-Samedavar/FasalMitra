@@ -25,7 +25,7 @@ export default function CultivationProcessPage() {
   const crops: CropInfo[] = [
     {
       name: "Rice",
-      image: "/placeholder.svg?height=300&width=400",
+      image: "rice.jpg",
       description:
         "Rice is one of the most important food crops in India, particularly in the eastern and southern regions.",
       season: "Kharif (June-July to October-November)",
@@ -71,7 +71,7 @@ export default function CultivationProcessPage() {
     },
     {
       name: "Wheat",
-      image: "/placeholder.svg?height=300&width=400",
+      image: "wheat.jpg",
       description:
         "Wheat is the second most important cereal crop in India after rice and is the main food crop in northern and central India.",
       season: "Rabi (October-November to March-April)",
@@ -112,7 +112,7 @@ export default function CultivationProcessPage() {
     },
     {
       name: "Cotton",
-      image: "/placeholder.svg?height=300&width=400",
+      image: "cotton.jpg",
       description:
         "Cotton is one of the most important commercial crops in India, providing livelihood to millions of farmers.",
       season: "Kharif (April-May to October-November)",
@@ -158,7 +158,7 @@ export default function CultivationProcessPage() {
     },
     {
       name: "Sugarcane",
-      image: "/placeholder.svg?height=300&width=400",
+      image: "sugar.jpeg",
       description: "Sugarcane is an important cash crop in India, used for sugar, jaggery, and ethanol production.",
       season: "Planted in different seasons: Spring (February-March), Autumn (October), and Adsali (July-August)",
       soilType: "Well-drained, deep, loamy soils rich in organic matter",

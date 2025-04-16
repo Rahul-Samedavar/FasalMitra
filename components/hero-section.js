@@ -1,6 +1,8 @@
 import Link from "next/link"
 import AnimationWrapper from "./animation-wrapper"
 import { Upload, MessageSquare } from "lucide-react"
+import Image from "next/image"
+
 
 const HeroSection = () => {
   return (
@@ -33,11 +35,13 @@ const HeroSection = () => {
           </AnimationWrapper>
           <AnimationWrapper className="md:w-1/2" delay={300}>
             <div className="relative">
-              <img
-                src="/placeholder.svg?height=400&width=500"
-                alt="Farmer using crop disease detection app"
-                className="rounded-lg shadow-lg w-full"
+            <img
+              src="b.jpg"
+              alt="Farmer using crop disease detection app"
+              className="rounded-lg shadow-lg w-full"
               />
+
+
               <div className="absolute -bottom-4 -right-4 bg-accent-beige p-3 rounded-lg shadow-md">
                 <p className="text-primary-green font-semibold">Trusted by 10,000+ farmers across India</p>
               </div>
