@@ -1,0 +1,141 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary-green: #1f4529;
+  --secondary-green: #47663b;
+  --background-light: #e8ecd7;
+  --accent-beige: #eed3b1;
+}
+
+body {
+  background-color: var(--background-light);
+  color: var(--primary-green);
+}
+
+.text-primary-green {
+  color: var(--primary-green);
+}
+
+.text-secondary-green {
+  color: var(--secondary-green);
+}
+
+.bg-primary-green {
+  background-color: var(--primary-green);
+}
+
+.bg-secondary-green {
+  background-color: var(--secondary-green);
+}
+
+.bg-background-light {
+  background-color: var(--background-light);
+}
+
+.bg-accent-beige {
+  background-color: var(--accent-beige);
+}
+
+.border-primary-green {
+  border-color: var(--primary-green);
+}
+
+.border-secondary-green {
+  border-color: var(--secondary-green);
+}
+
+.hover-grow {
+  transition: transform 0.3s ease;
+}
+
+.hover-grow:hover {
+  transform: scale(1.03);
+}
+
+.fade-in {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.btn-primary-green {
+  background-color: var(--primary-green);
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.btn-primary-green:hover {
+  background-color: var(--secondary-green);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-accent {
+  background-color: var(--accent-beige);
+  color: var(--primary-green);
+  transition: all 0.3s ease;
+}
+
+.btn-accent:hover {
+  background-color: #e6c29a;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.nav-link {
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+.nav-link::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -2px;
+  left: 0;
+  background-color: var(--accent-beige);
+  transition: width 0.3s ease;
+}
+
+.nav-link:hover::after,
+.nav-link.active::after {
+  width: 100%;
+}
+
+.card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.chat-message {
+  max-width: 80%;
+  margin-bottom: 10px;
+  padding: 10px 15px;
+  border-radius: 15px;
+}
+
+.user-message {
+  background-color: var(--accent-beige);
+  color: var(--primary-green);
+  border-top-left-radius: 0;
+  align-self: flex-start;
+}
+
+.bot-message {
+  background-color: var(--secondary-green);
+  color: white;
+  border-top-right-radius: 0;
+  align-self: flex-end;
+}
