@@ -24,6 +24,9 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
+
+  
+
   const navLinks = [
     { name: "Home", path: "/" },
     { name: "Cultivation Process", path: "/cultivation-process" },
@@ -90,6 +93,7 @@ const Navbar = () => {
           </div>
         )}
       </div>
+      <div id="hidden_translate_element" style={{ display: "none" }}></div>
     </nav>
   )
 }

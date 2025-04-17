@@ -31,7 +31,7 @@ export default function ServicesPage() {
   const [result, setResult] = useState<DiseaseDetails | null>(null)
   const [error, setError] = useState<string | null>(null)
 
-  const crops = ["Potato", "Corn", "Rice", "Wheat", "Pepper Bulb"]
+  const crops = ["Potato", "Corn", "Rice", "Wheat", "Pepper Bell"]
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -163,7 +163,7 @@ export default function ServicesPage() {
       },
     },
   
-    "Pepper Bulb": {
+    "Pepper Bell": {
       "Bacterial Spot": {
         causes: [
           "Bacterial pathogen Xanthomonas campestris pv. vesicatoria infects leaves and fruits",
@@ -256,6 +256,60 @@ export default function ServicesPage() {
         prevention: ["Maintain proper nutrition and spacing", "Monitor for early signs of disease regularly"],
       },
     },
+
+    Wheat: {
+      "Brown Rust": {
+        causes: [
+          "Caused by the fungus *Puccinia triticina*, spread via airborne spores",
+          "Favored by warm temperatures (15–22°C) and moist conditions",
+        ],
+        effects: [
+          "Small, circular, reddish-brown pustules mainly on lower leaves",
+          "Reduces photosynthetic area, leading to poor grain filling and yield loss",
+        ],
+        treatment: [
+          "Spray fungicides like Propiconazole at early infection stage",
+          "Remove volunteer wheat and weed hosts",
+        ],
+        prevention: [
+          "Use rust-resistant wheat varieties",
+          "Practice crop rotation and timely sowing",
+          "Monitor fields regularly during growth stages",
+        ],
+      },
+      "Yellow Rust": {
+        causes: [
+          "Caused by the fungus *Puccinia striiformis f. sp. tritici*, spread by wind-borne spores",
+          "Favors cool (10–15°C) and humid conditions",
+        ],
+        effects: [
+          "Yellow, stripe-like pustules on leaves and leaf sheaths",
+          "Can lead to premature leaf death, stunted growth, and yield loss",
+        ],
+        treatment: [
+          "Apply fungicides like Tebuconazole or Mancozeb when symptoms appear",
+          "Remove infected plant debris from fields",
+        ],
+        prevention: [
+          "Grow resistant wheat varieties",
+          "Avoid late sowing and dense planting",
+          "Ensure balanced fertilizer application",
+        ],
+      },
+      "Healthy": {
+        causes: [],
+        effects: [
+          "Vigorous plants with green, upright leaves and no rust pustules",
+        ],
+        treatment: [],
+        prevention: [
+          "Use certified disease-free seeds",
+          "Follow integrated nutrient and disease management practices",
+          "Monitor field conditions and apply preventive measures in time",
+        ],
+      },
+    }
+    
   };
   
   
