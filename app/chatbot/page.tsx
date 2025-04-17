@@ -11,7 +11,7 @@ interface Message {
   sender: "user" | "bot"
 }
 
-const languageOptions = ["English", "Hindi", "Tamil", "Telugu", "Kannada", "Marathi"]
+const languageOptions = ["English", "Hindi", "Kannada", "Marathi", "Tamil", "Telugu"]
 
 export default function ChatbotPage() {
   const [messages, setMessages] = useState<Message[]>([
@@ -24,6 +24,8 @@ export default function ChatbotPage() {
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [language, setLanguage] = useState("English")
+  const [speakingId, setSpeakingId] = useState<number | null>(null)
+  const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const scrollToBottom = () => {
@@ -33,6 +35,67 @@ export default function ChatbotPage() {
   useEffect(() => {
     scrollToBottom()
   }, [messages])
+
+
+  const getLanguageCode = (lang: string) => {
+    switch (lang) {
+      case "Hindi": return "hi-IN"
+      case "Tamil": return "ta-IN"
+      case "Telugu": return "te-IN"
+      case "Kannada": return "kn-IN"
+      case "Marathi": return "mr-IN"
+      default: return "en-US"
+    }
+  }
+
+  const stripHtml = (html: string) => {
+    const doc = new DOMParser().parseFromString(html, "text/html")
+    return doc.body.textContent || ""
+  }
+  
+
+  const toggleSpeak = async (text: string, id: number) => {
+    // If the same message is clicked again, pause or play the current audio
+    if (speakingId === id) {
+      if (currentAudio) {
+        if (currentAudio.paused) {
+          currentAudio.play()  // If it's paused, resume it
+        } else {
+          currentAudio.pause()  // If it's playing, pause it
+          setSpeakingId(null)
+        }
+      }
+      return
+    }
+  
+    setSpeakingId(id)
+  
+    try {
+      const res = await fetch("http://127.0.0.1:8000/tts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: stripHtml(text), lang: language }),
+      })
+  
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+  
+      // Create a new audio object and set it as the current audio
+      const audio = new Audio(url)
+      audio.onended = () => {
+        setSpeakingId(null)
+        URL.revokeObjectURL(url)
+      }
+  
+      setCurrentAudio(audio)  // Store the current audio object
+      audio.play()  // Play the audio
+    } catch (err) {
+      console.error("TTS Error:", err)
+      setSpeakingId(null)
+    }
+  }
+  
+  
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -131,11 +194,23 @@ export default function ChatbotPage() {
                 key={message.id}
                 className={`chat-message ${message.sender === "user" ? "user-message" : "bot-message"}`}
               >
-                {message.sender === "bot" ? (
-                  <div dangerouslySetInnerHTML={{ __html: message.text }} />
-                ) : (
-                  message.text
-                )}
+              <div className="flex items-start gap-2">
+                <div className="flex-1">
+                  {message.sender === "bot" ? (
+                    <div dangerouslySetInnerHTML={{ __html: message.text }} />
+                  ) : (
+                    <span>{message.text}</span>
+                  )}
+                </div>
+                <button
+                  onClick={() => toggleSpeak(message.text, message.id)}
+                  className="text-primary-green hover:text-secondary-green transition-colors"
+                  title={speakingId === message.id ? "Stop" : "Speak"}
+                >
+                  🔊
+                </button>
+              </div>
+
               </div>
             ))}
             {isLoading && (
